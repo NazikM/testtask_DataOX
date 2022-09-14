@@ -94,7 +94,7 @@ if __name__ == '__main__':
     DB_USER = 'postgres'
     DB_PASSWORD = 'password'
 
-    db_string = f'postgresql://{DB_USER}:{DB_PASSWORD}@localhost:5433/{DB_NAME}'
+    db_string = f'postgresql://{DB_USER}:{DB_PASSWORD}@database:5432/{DB_NAME}'
     engine = db.create_engine(db_string)
     connection = engine.connect()
     connection.execute("SET DateStyle='DMY'")
