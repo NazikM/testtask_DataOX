@@ -2,6 +2,7 @@ import sqlalchemy as db
 import requests
 from bs4 import BeautifulSoup
 from datetime import date, datetime, timedelta
+from decimal import Decimal
 
 
 def create_table():
@@ -14,7 +15,8 @@ def create_table():
                      db.Column('city', db.String(255)),
                      db.Column('beds', db.String(20)),
                      db.Column('description', db.Text()),
-                     db.Column('price', db.Text()),
+                     db.Column('price', db.DECIMAL()),
+                     db.Column('currency', db.String(3)),
                      )
 
     metadata.create_all(engine)
@@ -55,13 +57,24 @@ def parse_page(page):
         beds = i.select_one('.bedrooms').text.split(":")[1].strip()
         description = i.select_one('.description').text.strip()
         price = i.select_one('.price').text.strip()
+        currency = "USD"
+        if price == "Please Contact":
+            price = Decimal(-1.0)
+        else:
+            if price[0] == "€":
+                currency = "EUR"
+            elif price[0] == "¥":
+                currency = "YEN"
+            price = price[1:]
+            price = Decimal(price.replace(',', ''))
         data.append({'image': image_url,
                     'title': title,
                     'date_posted': date_created,
                     'city': city,
                     'beds': beds,
                     'description': description,
-                    'price': price})
+                    'price': price,
+                    'currency': currency})
     return r.url, data
 
 
